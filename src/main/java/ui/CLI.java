@@ -1,45 +1,50 @@
 package ui;
 
-import services.RepositoryCLIAdapter;
+import command.*;
+import items.Item;
+import repository.Repository;
+import repository.RepositoryInMemory;
+import services.CLIAdapters.RepositoryCLIAdapter;
+import services.RepositoryAdapter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
-public class CLI implements UI{
+public class CLI implements UI {
 
-  private boolean runnable = true;
-  private final RepositoryCLIAdapter repositoryCLIAdapter = new RepositoryCLIAdapter();
+  private final Repository<Item> repository = RepositoryInMemory.getInstance();
+  private final RepositoryAdapter adapter = new RepositoryCLIAdapter(repository);
+  private final List<Command> commands = new ArrayList<>(
+    Arrays.asList(
+      new AcceptItemsCommand(adapter),
+      new SellItemCommand(adapter),
+      new ViewCatalogCommand(adapter),
+      new ChangeItemsDataCommand(adapter),
+      new ExitCommand()
+    )
+  );
 
   @Override
   public void run() {
     System.out.println("Program is running.");
     Scanner scn = new Scanner(System.in);
-    while (runnable) {
-      System.out.println("""
-        ----------------Menu----------------
-        1. Accept items
-        2. Sell item
-        3. View catalog
-        4. Change items data
-        5. Exit""");
+    while (true) {
+      printMenu();
       try {
-        runnable = execute(Integer.parseInt(scn.nextLine()));
+        int choose = Integer.parseInt(scn.nextLine()) - 1;
+        if (choose >= 0 && choose < commands.size()) commands.get(choose).execute();
       } catch (NumberFormatException e) {
         System.out.println("--> Error!!! Incorrect input. <--");
       }
     }
   }
 
-  private boolean execute(int n) {
-    switch (n) {
-      case 1 -> repositoryCLIAdapter.acceptItems();
-      case 2 -> repositoryCLIAdapter.sellAnItem();
-      case 3 -> repositoryCLIAdapter.viewCatalog();
-      case 4 -> repositoryCLIAdapter.changeItemsData();
-      case 5 -> {
-        return false;
-      }
-      default -> System.out.println("Incorrect operation");
+  private void printMenu() {
+    System.out.println("------------Menu-----------");
+    for (int i = 0; i < commands.size(); i++) {
+      System.out.println(i + 1 + " -> " + commands.get(i));
     }
-    return true;
   }
 }

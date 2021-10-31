@@ -5,8 +5,8 @@ import java.util.Calendar;
 
 public class Newspaper extends Item {
 
-  public Newspaper(String title, Integer number, Calendar releaseDate) {
-    super(title, null, null, number, null, releaseDate);
+  public Newspaper(Long id, String title, Integer number, Calendar releaseDate) {
+    super(id, title, null, null, number, null, releaseDate);
   }
 
   @Override

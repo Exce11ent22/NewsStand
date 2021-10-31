@@ -1,17 +1,15 @@
 package repository;
 
-import items.Item;
-
 import java.util.List;
 
-public interface Repository {
+public interface Repository<T> {
 
-  List<Item> getAll();
+  List<T> getAll();
 
-  void add(Item item);
+  void add(T item);
 
-  void deleteByIndex(int index);
+  void delete(T item);
 
-  void replaceAll(Item existing, Item toReplace);
+  void replaceAll(T existing, T itemToReplace);
 
 }

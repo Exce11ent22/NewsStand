@@ -5,16 +5,17 @@ import items.Item;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositoryInMemory implements Repository{
+public class RepositoryInMemory implements Repository<Item> {
 
   private static RepositoryInMemory INSTANCE;
   private final List<Item> items;
+  private Long id = 1L;
 
-  private RepositoryInMemory(){
+  private RepositoryInMemory() {
     items = new ArrayList<>();
   }
 
-  public static RepositoryInMemory getInstance(){
+  public static RepositoryInMemory getInstance() {
     if (INSTANCE == null) INSTANCE = new RepositoryInMemory();
     return INSTANCE;
   }
@@ -26,18 +27,32 @@ public class RepositoryInMemory implements Repository{
 
   @Override
   public void add(Item item) {
+    item.setId(id);
+    id++;
     items.add(item);
   }
 
   @Override
-  public void deleteByIndex(int index) {
-    items.remove(index);
+  public void delete(Item item) {
+    items.remove(item);
   }
 
+  /**
+   * All existing items will be replaced by itemToReplace
+   */
   @Override
-  public void replaceAll(Item existing, Item toReplace) {
-    for (int i = 0; i < items.size(); i++) {
-      if (items.get(i) == existing) items.set(i, toReplace);
+  public void replaceAll(Item existing, Item itemToReplace) {
+    for (Item item : items) {
+      if (item.sameTo(existing)) {
+        item.setTitle(itemToReplace.getTitle());
+        item.setAuthor(itemToReplace.getAuthor());
+        item.setNumber(itemToReplace.getNumber());
+        item.setNumberOfPages(itemToReplace.getNumberOfPages());
+        item.setPublishingHouse(itemToReplace.getPublishingHouse());
+        item.setReleaseDate(itemToReplace.getReleaseDate());
+      }
     }
   }
+
+
 }

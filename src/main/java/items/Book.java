@@ -2,8 +2,8 @@ package items;
 
 public class Book extends Item {
 
-  public Book(String title, String author, String publishingHouse, int numberOfPages){
-    super(title, author, publishingHouse, null, numberOfPages, null);
+  public Book(Long id, String title, String author, String publishingHouse, int numberOfPages) {
+    super(id, title, author, publishingHouse, null, numberOfPages, null);
   }
 
   @Override

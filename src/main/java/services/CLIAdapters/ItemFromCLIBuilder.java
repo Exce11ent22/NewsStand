@@ -1,4 +1,4 @@
-package services;
+package services.CLIAdapters;
 
 import items.Book;
 import items.Item;
@@ -13,7 +13,7 @@ public class ItemFromCLIBuilder {
 
   private static final Scanner scn = new Scanner(System.in);
 
-  public static Item createItemFromCLI(Class<? extends Item> c){
+  public static Item createItemFromCLI(Class<? extends Item> c) {
     if (Book.class.equals(c)) return createBookFromCLI();
     if (Magazine.class.equals(c)) return createMagazineFromCLI();
     if (Newspaper.class.equals(c)) return createNewspaperFromCLI();
@@ -21,15 +21,15 @@ public class ItemFromCLIBuilder {
   }
 
   public static Book createBookFromCLI() {
-    return new Book(getTitle(), getAuthor(), getPublishingHouse(), getNumberOfPages());
+    return new Book(null, getTitle(), getAuthor(), getPublishingHouse(), getNumberOfPages());
   }
 
   public static Magazine createMagazineFromCLI() {
-    return new Magazine(getTitle(), getNumber(), getReleaseDate(), getNumberOfPages());
+    return new Magazine(null, getTitle(), getNumber(), getReleaseDate(), getNumberOfPages());
   }
 
   public static Newspaper createNewspaperFromCLI() {
-    return new Newspaper(getTitle(), getNumber(), getReleaseDate());
+    return new Newspaper(null, getTitle(), getNumber(), getReleaseDate());
   }
 
   private static String getTitle() {
