@@ -22,11 +22,11 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
     return false;
   }
 
-  private static boolean containItem(Map<Item, Integer> items, Item toCheck) {
+  private static Item containItem(Map<Item, Integer> items, Item toCheck) {
     for (Map.Entry<Item, Integer> entry : items.entrySet()) {
-      if (entry.getKey().sameTo(toCheck)) return true;
+      if (entry.getKey().sameTo(toCheck)) return entry.getKey();
     }
-    return false;
+    return null;
   }
 
   @Override
@@ -37,6 +37,14 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
       "2. Magazine\n" +
       "3. Newspaper\n");
     Item item = chooseItem();
+    boolean accepted = false;
+    while(!accepted){
+      System.out.println("Are you sure you want to add\n" + item + "\nin your repo?\n[Y/N]");
+      String answer = scn.nextLine().toLowerCase();
+      if (answer.equals("y")) accepted = true;
+      else if (!answer.equals("n")) return;
+      item = accepted ? item : chooseItem();
+    }
     if (item == null) return;
 
     System.out.println("How much?");
@@ -72,26 +80,6 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
     }
   }
 
-  @Override
-  public void changeItemsData() {
-    List<Item> items = getDifferentItems();
-
-    if (items.size() == 0) return;
-
-    System.out.println("Enter the number of the item you would like to change:");
-    for (int i = 0; i < items.size(); i++) System.out.println((i + 1) + ") " + items.get(i));
-
-    int choose = Integer.parseInt(scn.nextLine()) - 1;
-    if (choose >= 0 && choose < items.size()) {
-      Item item = ItemFromCLIBuilder.createItemFromCLI(items.get(choose).getClass());
-      if (item != null) {
-        repository.replaceAll(repository.getAll().get(repository.getAll().indexOf(items.get(choose))), item);
-      }
-    } else {
-      System.out.println("Out of range!");
-    }
-  }
-
   private Item chooseItem() {
     Item item = null;
     switch (Integer.parseInt(scn.nextLine())) {
@@ -103,6 +91,9 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
     return item;
   }
 
+  /**
+   * returns items only with unique fields
+   */
   private List<Item> getDifferentItems() {
     List<Item> items = repository.getAll();
     List<Item> result = new ArrayList<>();
@@ -112,12 +103,16 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
     return result;
   }
 
+  /**
+   * returns items only with unique fields and counts similar in repo
+   */
   private Map<Item, Integer> getCatalog() {
     Map<Item, Integer> catalog = new HashMap<>();
     List<Item> items = repository.getAll();
     for (Item item : items) {
-      if (containItem(catalog, item)) {
-        catalog.put(item, catalog.get(item) + 1);
+      Item itemToPut = containItem(catalog, item);
+      if (itemToPut != null) {
+        catalog.put(itemToPut, catalog.get(itemToPut) + 1);
       } else {
         catalog.put(item, 1);
       }

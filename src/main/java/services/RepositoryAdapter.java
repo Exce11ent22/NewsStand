@@ -8,6 +8,4 @@ public interface RepositoryAdapter {
 
   void viewCatalog();
 
-  void changeItemsData();
-
 }

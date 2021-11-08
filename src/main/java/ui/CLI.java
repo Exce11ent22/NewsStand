@@ -14,17 +14,13 @@ import java.util.Scanner;
 
 public class CLI implements UI {
 
-  private final Repository<Item> repository = RepositoryInMemory.getInstance();
-  private final RepositoryAdapter adapter = new RepositoryCLIAdapter(repository);
-  private final List<Command> commands = new ArrayList<>(
-    Arrays.asList(
-      new AcceptItemsCommand(adapter),
-      new SellItemCommand(adapter),
-      new ViewCatalogCommand(adapter),
-      new ChangeItemsDataCommand(adapter),
-      new ExitCommand()
-    )
-  );
+  private final RepositoryAdapter adapter;
+  private final List<Command> commands;
+
+  public CLI(RepositoryAdapter adapter, List<Command> commands) {
+    this.adapter = adapter;
+    this.commands = commands;
+  }
 
   @Override
   public void run() {

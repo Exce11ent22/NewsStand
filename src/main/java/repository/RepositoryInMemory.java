@@ -37,22 +37,4 @@ public class RepositoryInMemory implements Repository<Item> {
     items.remove(item);
   }
 
-  /**
-   * All existing items will be replaced by itemToReplace
-   */
-  @Override
-  public void replaceAll(Item existing, Item itemToReplace) {
-    for (Item item : items) {
-      if (item.sameTo(existing)) {
-        item.setTitle(itemToReplace.getTitle());
-        item.setAuthor(itemToReplace.getAuthor());
-        item.setNumber(itemToReplace.getNumber());
-        item.setNumberOfPages(itemToReplace.getNumberOfPages());
-        item.setPublishingHouse(itemToReplace.getPublishingHouse());
-        item.setReleaseDate(itemToReplace.getReleaseDate());
-      }
-    }
-  }
-
-
 }

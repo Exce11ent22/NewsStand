@@ -10,6 +10,4 @@ public interface Repository<T> {
 
   void delete(T item);
 
-  void replaceAll(T existing, T itemToReplace);
-
 }
