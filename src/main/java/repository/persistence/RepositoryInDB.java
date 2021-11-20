@@ -13,18 +13,19 @@ import java.util.Date;
 
 public class RepositoryInDB implements Repository<Item> {
 
-  private final ConnectionManager connectionManager;
+  private final ConnectionPool connectionPool;
 
-  public RepositoryInDB(ConnectionManager connectionManager) {
-    this.connectionManager = connectionManager;
+  public RepositoryInDB(ConnectionPool connectionPool) {
+    this.connectionPool = connectionPool;
   }
 
   @Override
   public List<Item> getAll() {
     try {
-      Connection connection = connectionManager.getConnection();
+      Connection connection = connectionPool.getConnection();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery("SELECT * FROM items");
+      connectionPool.releaseConnection(connection);
       return extractor.extract(resultSet);
     } catch (SQLException e) {
       e.printStackTrace();
@@ -35,13 +36,14 @@ public class RepositoryInDB implements Repository<Item> {
   @Override
   public void add(Item item) {
     try {
-      Connection connection = connectionManager.getConnection();
+      Connection connection = connectionPool.getConnection();
       Statement statement = connection.createStatement();
       statement.execute(String.format("INSERT INTO " +
           "ITEMS(TITLE, AUTHOR, PUBLISHING_HOUSE, NUMBER, NUMBER_OF_PAGES, RELEASE_DATE, CLASS)" +
           "VALUES( %s , %s , %s , %s , %s , %s , %s );",
         getTitleAsString(item), getAuthorAsString(item), getPublishingHouseAsStirng(item), getNumberAsString(item),
         getNumberOfPagesAsString(item), getReleaseDateAsString(item), getItemClassAsString(item)));
+      connectionPool.releaseConnection(connection);
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -52,10 +54,11 @@ public class RepositoryInDB implements Repository<Item> {
     Long id = item.getId();
     if (id == null) return;
     try {
-      Connection connection = connectionManager.getConnection();
+      Connection connection = connectionPool.getConnection();
       Statement statement = connection.createStatement();
       statement.execute(String.format("DELETE ITEMS " +
         "WHERE ID = %s;", id));
+      connectionPool.releaseConnection(connection);
     } catch (SQLException e) {
       e.printStackTrace();
     }
