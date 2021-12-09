@@ -1,5 +1,5 @@
 import command.*;
-import items.Item;
+import entity.Item;
 import repository.Repository;
 import repository.persistence.BasicConnectionPool;
 import repository.persistence.ConnectionPool;
@@ -35,8 +35,7 @@ public class Main {
       )
     );
 
-    UI ui = new CLI(adapter, commands);
+    UI ui = new CLI(commands);
     ui.run();
-
   }
 }

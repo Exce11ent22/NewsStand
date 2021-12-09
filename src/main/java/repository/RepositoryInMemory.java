@@ -1,6 +1,6 @@
 package repository;
 
-import items.Item;
+import entity.Item;
 
 import java.util.ArrayList;
 import java.util.List;

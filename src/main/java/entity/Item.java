@@ -1,13 +1,22 @@
-package items;
+package entity;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Objects;
+import java.util.Scanner;
 
 public abstract class Item {
 
+  @Getter @Setter
   protected Long id;
+  @Getter @Setter
   protected String title, author, publishingHouse;
+  @Getter @Setter
   protected Integer number, numberOfPages;
+  @Getter @Setter
   protected Calendar releaseDate;
 
   public Item(Long id, String title, String author, String publishingHouse, Integer number, Integer numberOfPages, Calendar releaseDate) {
@@ -17,62 +26,6 @@ public abstract class Item {
     this.publishingHouse = publishingHouse;
     this.number = number;
     this.numberOfPages = numberOfPages;
-    this.releaseDate = releaseDate;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public String getAuthor() {
-    return author;
-  }
-
-  public void setAuthor(String author) {
-    this.author = author;
-  }
-
-  public String getPublishingHouse() {
-    return publishingHouse;
-  }
-
-  public void setPublishingHouse(String publishingHouse) {
-    this.publishingHouse = publishingHouse;
-  }
-
-  public Integer getNumber() {
-    return number;
-  }
-
-  public void setNumber(Integer number) {
-    this.number = number;
-  }
-
-  public Integer getNumberOfPages() {
-    return numberOfPages;
-  }
-
-  public void setNumberOfPages(Integer numberOfPages) {
-    this.numberOfPages = numberOfPages;
-  }
-
-  public Calendar getReleaseDate() {
-    return releaseDate;
-  }
-
-  public void setReleaseDate(Calendar releaseDate) {
     this.releaseDate = releaseDate;
   }
 

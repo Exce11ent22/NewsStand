@@ -12,7 +12,7 @@ public class BasicConnectionPool implements ConnectionPool, Shutdownable {
 
   private final List<Connection> connectionPool;
   private final List<Connection> usedConnections = new ArrayList<>();
-  private final static int INITIAL_POOL_SIZE = 10;
+  private final static int INITIAL_POOL_SIZE = 2;
 
   public static BasicConnectionPool create(String url, String user, String password) throws SQLException {
     List<Connection> pool = new ArrayList<>(INITIAL_POOL_SIZE);

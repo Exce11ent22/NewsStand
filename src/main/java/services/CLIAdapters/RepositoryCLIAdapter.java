@@ -1,6 +1,9 @@
 package services.CLIAdapters;
 
-import items.Item;
+import entity.Item;
+import entity.ItemFactory;
+import entity.ItemType;
+import entity.configurator.ItemFromCLIConfigurator;
 import repository.Repository;
 import services.RepositoryAdapter;
 
@@ -31,26 +34,18 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
 
   @Override
   public void acceptItems() {
-    System.out.println(
-      "Select the item you want to add:\n" +
-      "1. Book\n" +
-      "2. Magazine\n" +
-      "3. Newspaper\n");
-    Item item = chooseItem();
-    boolean accepted = false;
-    while(!accepted){
-      System.out.println("Are you sure you want to add\n" + item + "\nin your repo?\n[Y/N]");
-      String answer = scn.nextLine().toLowerCase();
-      if (answer.equals("y")) accepted = true;
-      else if (!answer.equals("n")) return;
-      item = accepted ? item : chooseItem();
+    System.out.println("Select the item you want to add:\n");
+    Item item = chooseAndCreateItem();
+    if (item == null){
+      System.out.println("Error!!!");
+      return;
     }
-    if (item == null) return;
-
     System.out.println("How much?");
     int choose = Integer.parseInt(scn.nextLine());
     if (choose > 0) {
       for (int i = 0; i < choose; i++) repository.add(item);
+    } else {
+      System.out.println("Incorrect input!");
     }
   }
 
@@ -80,19 +75,16 @@ public class RepositoryCLIAdapter implements RepositoryAdapter {
     }
   }
 
-  private Item chooseItem() {
-    Item item = null;
-    switch (Integer.parseInt(scn.nextLine())) {
-      case 1: item = ItemFromCLIBuilder.createBookFromCLI(); break;
-      case 2: item = ItemFromCLIBuilder.createMagazineFromCLI(); break;
-      case 3: item = ItemFromCLIBuilder.createNewspaperFromCLI(); break;
-      default: System.out.println("Out of range!");
+  private Item chooseAndCreateItem() {
+    for (ItemType itemType : ItemType.values()) {
+      System.out.println(itemType.getTypeNumber() + " -> " + itemType.getItemClass().getSimpleName());
     }
-    return item;
+    int choose = Integer.parseInt(scn.nextLine());
+    return ItemFactory.create(ItemType.getTypeFromTypeNumber(choose), new ItemFromCLIConfigurator());
   }
 
   /**
-   * returns items only with unique fields
+   * returns only items with unique fields
    */
   private List<Item> getDifferentItems() {
     List<Item> items = repository.getAll();

@@ -1,13 +1,11 @@
 package repository.persistence;
 
-import items.Book;
-import items.Item;
-import items.Magazine;
-import items.Newspaper;
+import entity.ItemFactory;
+import entity.ItemType;
+import entity.Item;
 import repository.Repository;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
@@ -37,12 +35,22 @@ public class RepositoryInDB implements Repository<Item> {
   public void add(Item item) {
     try {
       Connection connection = connectionPool.getConnection();
-      Statement statement = connection.createStatement();
-      statement.execute(String.format("INSERT INTO " +
-          "ITEMS(TITLE, AUTHOR, PUBLISHING_HOUSE, NUMBER, NUMBER_OF_PAGES, RELEASE_DATE, CLASS)" +
-          "VALUES( %s , %s , %s , %s , %s , %s , %s );",
-        getTitleAsString(item), getAuthorAsString(item), getPublishingHouseAsStirng(item), getNumberAsString(item),
-        getNumberOfPagesAsString(item), getReleaseDateAsString(item), getItemClassAsString(item)));
+      PreparedStatement ps = connection.prepareStatement(
+        "insert into ITEMS(title, author, publishing_house, number, number_of_pages, release_date, item_type) " +
+          "values ( ? , ? , ? , ? , ? , ? , ? )"
+      );
+      ps.setObject(1, item.getTitle(), Types.VARCHAR);
+      ps.setObject(2, item.getAuthor(), Types.VARCHAR);
+      ps.setObject(3, item.getPublishingHouse(), Types.VARCHAR);
+      ps.setObject(4, item.getNumber(), Types.INTEGER);
+      ps.setObject(5, item.getNumberOfPages(), Types.INTEGER);
+      if(item.getReleaseDate() == null){
+        ps.setNull(6, Types.DATE);
+      } else {
+        ps.setDate(6, new java.sql.Date(item.getReleaseDate().getTimeInMillis()));
+      }
+      ps.setObject(7, Objects.requireNonNull(ItemType.getTypeFromClass(item.getClass())).getTypeNumber(), Types.INTEGER);
+      ps.execute();
       connectionPool.releaseConnection(connection);
     } catch (SQLException e) {
       e.printStackTrace();
@@ -67,30 +75,18 @@ public class RepositoryInDB implements Repository<Item> {
   private final Extractor<Item> extractor = rs -> {
     List<Item> items = new ArrayList<>();
     while (rs.next()) {
-      // получить все поля
-      Long id = rs.getLong("id");
-      String title = rs.getString("title");
-      String author = rs.getString("author");
-      String publishingHouse = rs.getString("publishing_house");
-      Integer number = rs.getInt("number");
-      Integer numberOfPages = rs.getInt("number_of_pages");
-      Calendar releaseDate = toCalendar(rs.getDate("release_date"));
-      Class<? extends Item> itemClass = null;
-      try {
-        itemClass = (Class<? extends Item>) Class.forName(rs.getString("class"));
-      } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-      }
+      Item item = ItemFactory.createEmptyItem(ItemType.getTypeFromTypeNumber(rs.getInt("item_type")));
+      if (item == null) continue;
 
-      // в зависимости от поля class создать экземпляр нужного класса и наполнить полями
-      Item item = null;
-      assert itemClass != null;
-      if (itemClass.equals(Book.class)) item = new Book(id, title, author, publishingHouse, numberOfPages);
-      if (itemClass.equals(Magazine.class)) item = new Magazine(id, title, number, releaseDate, numberOfPages);
-      if (itemClass.equals(Newspaper.class)) item = new Newspaper(id, title, number, releaseDate);
+      item.setId(rs.getLong("id"));
+      item.setTitle(rs.getString("title"));
+      item.setAuthor(rs.getString("author"));
+      item.setPublishingHouse(rs.getString("publishing_house"));
+      item.setNumber(rs.getInt("number"));
+      item.setNumberOfPages(rs.getInt("number_of_pages"));
+      item.setReleaseDate(toCalendar(rs.getDate("release_date")));
 
-      // проверить объект
-      if (item != null) items.add(item);
+      items.add(item);
     }
     return items;
   };
@@ -101,34 +97,4 @@ public class RepositoryInDB implements Repository<Item> {
     cal.setTime(date);
     return cal;
   }
-
-  private String getTitleAsString(Item item) {
-    return item.getTitle() != null ? "'" + item.getTitle() + "'" : "null";
-  }
-
-  private String getAuthorAsString(Item item) {
-    return item.getAuthor() != null ? "'" + item.getAuthor() + "'" : "null";
-  }
-
-  private String getPublishingHouseAsStirng(Item item) {
-    return item.getPublishingHouse() != null ? "'" + item.getPublishingHouse() + "'" : "null";
-  }
-
-  private String getNumberAsString(Item item) {
-    return item.getNumber() != null ? item.getNumber().toString() : "null";
-  }
-
-  private String getNumberOfPagesAsString(Item item) {
-    return item.getNumberOfPages() != null ? item.getNumberOfPages().toString() : "null";
-  }
-
-  private String getReleaseDateAsString(Item item) {
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    return item.getReleaseDate() != null ? "'" + format.format(item.getReleaseDate().getTime()) + "'" : "null";
-  }
-
-  private String getItemClassAsString(Item item) {
-    return "'" + item.getClass().toString().split(" ")[1] + "'";
-  }
-
 }

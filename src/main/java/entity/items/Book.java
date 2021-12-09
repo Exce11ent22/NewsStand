@@ -1,9 +1,13 @@
-package items;
+package entity.items;
+
+import entity.Item;
+
+import java.util.Calendar;
 
 public class Book extends Item {
 
-  public Book(Long id, String title, String author, String publishingHouse, int numberOfPages) {
-    super(id, title, author, publishingHouse, null, numberOfPages, null);
+  public Book(){
+    super(null, null, null, null, null, null, null);
   }
 
   @Override
@@ -15,4 +19,5 @@ public class Book extends Item {
       ", numberOfPages=" + numberOfPages +
       '}';
   }
+
 }

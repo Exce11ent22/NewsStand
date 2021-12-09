@@ -1,24 +1,15 @@
 package ui;
 
 import command.*;
-import items.Item;
-import repository.Repository;
-import repository.RepositoryInMemory;
-import services.CLIAdapters.RepositoryCLIAdapter;
-import services.RepositoryAdapter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
 public class CLI implements UI {
 
-  private final RepositoryAdapter adapter;
   private final List<Command> commands;
 
-  public CLI(RepositoryAdapter adapter, List<Command> commands) {
-    this.adapter = adapter;
+  public CLI(List<Command> commands) {
     this.commands = commands;
   }
 
